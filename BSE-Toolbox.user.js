@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Blender Stack Exchange Toolbox
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.0.1
 // @description  Adds a floating window with message templates to Blender Stack Exchange sites.
-// @author       You
-// @match       *blender.stackexchange.com/questions/*/*
+// @author       Loïc "L0Lock" Dautry
+// @match        *blender.stackexchange.com/questions/*/*
 // @match        *blender.meta.stackexchange.com/questions/*/*
 // @grant        GM_addStyle
 // ==/UserScript==
