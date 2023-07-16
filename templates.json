@@ -1,16 +1,16 @@
 {
-	"version": "0.0.1",
-	
-	"templates":
-	[
-		{
-			"title": "Upload file to Blender-Exchange",
-			"message": "While detailed descriptions and screenshots are helpfull, some issues might require manual investigation. Please consider sharing your .blend file with use, you can do so by uploading it on [Blend-Exchange](https://blend-exchange.com/) and add the provided text into your post.",
-		},
-		 
-		{
-			"title": "Upload screenshots",
-			"message": "Please add screenshots or even GIFs to help us better understand your question.",
-		},
-	]
+    "version": "0.0.1",
+    
+    "templates":
+    [
+        {
+            "title": "Upload file to Blender-Exchange",
+            "message": "While detailed descriptions and screenshots are helpfull, some issues might require manual investigation. Please consider sharing your .blend file with use, you can do so by uploading it on [Blend-Exchange](https://blend-exchange.com/) and add the provided text into your post.",
+        },
+         
+        {
+            "title": "Upload screenshots",
+            "message": "Please add screenshots or even GIFs to help us better understand your question.",
+        },
+    ]
 }
