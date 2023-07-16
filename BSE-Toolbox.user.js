@@ -12,16 +12,10 @@
 (function () {
   'use strict';
 
-  // Helper function to inject a script into the page
-  function injectScript(url) {
-    const script = document.createElement('script');
-    script.src = url;
-    document.head.appendChild(script);
-  }
-
   // Create and style the floating window
   const floatingWindow = document.createElement('div');
   floatingWindow.id = 'bse-toolbox';
+  floatingWindow.tabIndex = -1; // Prevent the toolbox from receiving focus
   floatingWindow.style.position = 'fixed';
   floatingWindow.style.top = '50%';
   floatingWindow.style.left = '50%';
@@ -40,6 +34,45 @@
   titleElement.style.cursor = 'move';
   floatingWindow.appendChild(titleElement);
 
+  // Create the "Please select a text field first" message
+  const noTextFieldMsg = document.createElement('p');
+  noTextFieldMsg.innerText = 'Please select a text field first.';
+  noTextFieldMsg.style.color = '#999'; // Grey color
+  floatingWindow.appendChild(noTextFieldMsg);
+
+  // Function to prevent text selection while dragging the window
+  function preventTextSelection(event) {
+    event.preventDefault();
+  }
+
+  // Function to check if a textarea is in focus and is one of the target textareas
+  function isTargetTextareaInFocus() {
+    const activeElement = document.activeElement;
+    return activeElement && ['TEXTAREA'].includes(activeElement.tagName) && ['wmd-input', 'comment'].includes(activeElement.name);
+  }
+
+  // Function to handle template title click and insert the message into the active textarea
+  function handleTemplateTitleClick(message, event) {
+    if (isTargetTextareaInFocus()) {
+      const activeTextField = document.activeElement;
+      const previousSelectionStart = activeTextField.selectionStart;
+      const previousSelectionEnd = activeTextField.selectionEnd;
+
+      // Insert the message at the current cursor position
+      activeTextField.setRangeText(message, previousSelectionStart, previousSelectionEnd, 'end');
+
+      // Restore cursor position after inserting the message
+      activeTextField.selectionStart = previousSelectionStart + message.length;
+      activeTextField.selectionEnd = previousSelectionStart + message.length;
+
+      // Ensure the textarea stays focused after inserting the message
+      activeTextField.focus();
+    }
+
+    // Prevent the default behavior (e.g., focus) when clicking the template title
+    event.preventDefault();
+  }
+
   // Fetch the templates from the URL
   fetch('https://raw.githubusercontent.com/L0Lock/BSE-Toolbox/main/templates.json')
     .then((response) => response.json())
@@ -54,7 +87,7 @@
           const listItem = document.createElement('li');
           listItem.innerText = template.title;
           listItem.style.cursor = 'pointer';
-          listItem.addEventListener('click', () => insertTemplate(template.message));
+          listItem.addEventListener('mousedown', (event) => handleTemplateTitleClick(template.message, event));
           templateList.appendChild(listItem);
         });
         // Add the list to the floating window
@@ -67,23 +100,6 @@
       }
     })
     .catch((error) => console.error('Error fetching templates:', error));
-
-  // Function to insert the selected template message into the active text field
-  function insertTemplate(message) {
-    const activeTextField = document.activeElement;
-    if (activeTextField && ['INPUT', 'TEXTAREA'].includes(activeTextField.tagName)) {
-      // Insert the template message into the active text field
-      activeTextField.value += message;
-    } else {
-      // Show a message in the floating window if no text field is active
-      const noTextFieldMsg = document.createElement('p');
-      noTextFieldMsg.innerText = 'Please select a text field first.';
-      // Clear previous content and display the message at the top
-      floatingWindow.innerHTML = '';
-      floatingWindow.appendChild(titleElement);
-      floatingWindow.appendChild(noTextFieldMsg);
-    }
-  }
 
   // Add the floating window to the page
   document.body.appendChild(floatingWindow);
@@ -112,8 +128,8 @@
   let offset = { x: 0, y: 0 };
   titleElement.addEventListener('mousedown', (e) => {
     isDragging = true;
-    const rect = floatingWindow.getBoundingClientRect();
-    offset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    document.addEventListener('mousemove', preventTextSelection, true); // Prevent text selection during dragging
+    offset = { x: e.clientX - floatingWindow.offsetLeft, y: e.clientY - floatingWindow.offsetTop };
   });
 
   document.addEventListener('mousemove', (e) => {
@@ -127,20 +143,6 @@
 
   document.addEventListener('mouseup', () => {
     isDragging = false;
-  });
-
-  // Make the window foldable
-  let isFolded = false;
-  titleElement.addEventListener('click', () => {
-    isFolded = !isFolded;
-    if (isFolded) {
-      // Fold the window to show only the title
-      floatingWindow.style.minHeight = 'auto';
-      floatingWindow.style.overflowY = 'hidden';
-    } else {
-      // Unfold the window to show the content
-      floatingWindow.style.minHeight = 'unset';
-      floatingWindow.style.overflowY = 'auto';
-    }
+    document.removeEventListener('mousemove', preventTextSelection, true); // Remove text selection prevention
   });
 })();
