@@ -7,142 +7,128 @@
 // @match        *blender.stackexchange.com/questions/*/*
 // @match        *blender.meta.stackexchange.com/questions/*/*
 // @grant        GM_addStyle
+// @grant        GM_xmlhttpRequest
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @require      https://code.jquery.com/jquery-3.3.1.min.js
+// @require      https://code.jquery.com/ui/1.12.1/jquery-ui.min.js
 // ==/UserScript==
 
 (function () {
-  'use strict';
+  let activeTextarea = null;
 
-  // Create and style the floating window
-  const floatingWindow = document.createElement('div');
-  floatingWindow.id = 'bse-toolbox';
-  floatingWindow.tabIndex = -1; // Prevent the toolbox from receiving focus
-  floatingWindow.style.position = 'fixed';
-  floatingWindow.style.top = '50%';
-  floatingWindow.style.left = '50%';
-  floatingWindow.style.transform = 'translate(-50%, -50%)';
-  floatingWindow.style.padding = '10px';
-  floatingWindow.style.backgroundColor = '#fff';
-  floatingWindow.style.border = '1px solid #ccc';
-  floatingWindow.style.borderRadius = '5px';
-  floatingWindow.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-  floatingWindow.style.zIndex = '9999';
-  floatingWindow.style.minWidth = '200px';
-
-  // Add title "BSE Toolbox"
-  const titleElement = document.createElement('h2');
-  titleElement.innerText = 'BSE Toolbox';
-  titleElement.style.cursor = 'move';
-  floatingWindow.appendChild(titleElement);
-
-  // Create the "Please select a text field first" message
-  const noTextFieldMsg = document.createElement('p');
-  noTextFieldMsg.innerText = 'Please select a text field first.';
-  noTextFieldMsg.style.color = '#999'; // Grey color
-  floatingWindow.appendChild(noTextFieldMsg);
-
-  // Function to prevent text selection while dragging the window
-  function preventTextSelection(event) {
-    event.preventDefault();
-  }
-
-  // Function to check if a textarea is in focus and is one of the target textareas
-  function isTargetTextareaInFocus() {
-    const activeElement = document.activeElement;
-    return activeElement && ['TEXTAREA'].includes(activeElement.tagName) && ['wmd-input', 'comment'].includes(activeElement.name);
-  }
-
-  // Function to handle template title click and insert the message into the active textarea
-  function handleTemplateTitleClick(message, event) {
-    if (isTargetTextareaInFocus()) {
-      const activeTextField = document.activeElement;
-      const previousSelectionStart = activeTextField.selectionStart;
-      const previousSelectionEnd = activeTextField.selectionEnd;
-
-      // Insert the message at the current cursor position
-      activeTextField.setRangeText(message, previousSelectionStart, previousSelectionEnd, 'end');
-
-      // Restore cursor position after inserting the message
-      activeTextField.selectionStart = previousSelectionStart + message.length;
-      activeTextField.selectionEnd = previousSelectionStart + message.length;
-
-      // Ensure the textarea stays focused after inserting the message
-      activeTextField.focus();
+  // Function to insert text at the end of the textarea with the ID "wmd-input"
+  function insertTextAtEnd(text, textarea) {
+    if (textarea) {
+      const { selectionStart, selectionEnd } = textarea;
+      textarea.value =
+        textarea.value.substring(0, selectionStart) + text + textarea.value.substring(selectionEnd);
+      textarea.selectionStart = selectionStart + text.length;
+      textarea.selectionEnd = selectionStart + text.length;
+      textarea.focus();
     }
-
-    // Prevent the default behavior (e.g., focus) when clicking the template title
-    event.preventDefault();
   }
 
-  // Fetch the templates from the URL
-  fetch('https://raw.githubusercontent.com/L0Lock/BSE-Toolbox/main/templates.json')
-    .then((response) => response.json())
-    .then((data) => {
-      if (data && data.templates && data.templates.length > 0) {
-        // Sort the templates alphabetically based on title
-        const sortedTemplates = data.templates.sort((a, b) => a.title.localeCompare(b.title));
+  // Function to create and handle the click event of the floating button
+  function createFloatingWindow(templates) {
+    const container = $("<div>", {
+      id: "oc-mod-panel",
+      class: "window",
+      style: "position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 9999; width: 300px; border: 1px solid #ccc; border-radius: 5px; padding: 0; background: #fff;",
+    });
 
-        // Create the list of templates' titles
-        const templateList = document.createElement('ul');
-        sortedTemplates.forEach((template) => {
-          const listItem = document.createElement('li');
-          listItem.innerText = template.title;
-          listItem.style.cursor = 'pointer';
-          listItem.addEventListener('mousedown', (event) => handleTemplateTitleClick(template.message, event));
-          templateList.appendChild(listItem);
+      /*
+    const header = $("<h2>", {
+      class: "oc-mod-title",
+      style: "height: 40px; background: #dae6ee; display: flex; align-items: center; padding: 0 10px; font-weight: bold;",
+      html: "BSE Toolbox",
+    });
+    */
+
+    container.append(
+    '<div class="header", style="height: 40px;background: #dae6ee;display: flex;padding: 0 10px;margin:auto;font-weight: bold;flex-direction: row-reverse;align-items: baseline;justify-content: center;">'+
+    '<h2>'+
+    'BSE Toolbox'+
+    '</h2>'+
+    '</div>'
+    );
+
+    const content = $("<div>", {
+      id: "oc-mod-content",
+      style: "padding: 10px; overflow-y: auto; max-height: 400px;",
+    });
+
+    function updateDisplayedTemplates() {
+      content.empty(); // Clear previous content
+      templates.sort((a, b) => a.title.localeCompare(b.title));
+
+      templates.forEach((template) => {
+        const title = $("<div>", {
+          text: template.title,
+          style: "cursor: pointer; margin-bottom: 5px;",
         });
-        // Add the list to the floating window
-        floatingWindow.appendChild(templateList);
-      } else {
-        // Show a message if no templates are available
-        const noTemplatesMsg = document.createElement('p');
-        noTemplatesMsg.innerText = 'No templates available.';
-        floatingWindow.appendChild(noTemplatesMsg);
+
+        title.on("mousedown", function () {
+          insertTextAtEnd(template.message, activeTextarea);
+          if (activeTextarea) {
+            activeTextarea.focus();
+          }
+        });
+
+        content.append(title);
+      });
+    }
+
+    updateDisplayedTemplates();
+
+    container.append(content);
+
+    $("body").append(container);
+
+    //$(".window" ).draggable({ handle: ".header" });
+
+    // Make the container draggable using jQuery UI
+    container.draggable({
+      handle: ".header",
+      stop: function () {
+        GM_setValue("modPosX", $(this).position().left);
+        GM_setValue("modPosY", $(this).position().top);
+      },
+    });
+  }
+
+  // Inject jQuery UI CSS
+  GM_addStyle(
+    "@import url('https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'); #oc-mod-panel .ui-draggable { cursor: move; }"
+  );
+
+  // Fetch the templates.json from the provided link
+  fetch("https://raw.githubusercontent.com/L0Lock/BSE-Toolbox/main/templates.json")
+    .then((response) => response.json())
+    .then((data) => createFloatingWindow(data.templates))
+    .catch((error) => console.error("Error fetching templates:", error));
+
+  // Watch for changes in the DOM to add the window to new textareas added dynamically
+  const observer = new MutationObserver(function (mutationsList) {
+    for (const mutation of mutationsList) {
+      if (mutation.addedNodes && mutation.addedNodes.length) {
+        for (const node of mutation.addedNodes) {
+          if (node.tagName === "TEXTAREA" && node.id === "wmd-input") {
+            createFloatingWindow();
+            break;
+          }
+        }
       }
-    })
-    .catch((error) => console.error('Error fetching templates:', error));
-
-  // Add the floating window to the page
-  document.body.appendChild(floatingWindow);
-
-  // CSS styles for the floating window
-  GM_addStyle(`
-    #bse-toolbox {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    #bse-toolbox ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    #bse-toolbox li {
-      padding: 5px;
-    }
-    #bse-toolbox li:hover {
-      background-color: #f2f2f2;
-    }
-  `);
-
-  // Make the window draggable
-  let isDragging = false;
-  let offset = { x: 0, y: 0 };
-  titleElement.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    document.addEventListener('mousemove', preventTextSelection, true); // Prevent text selection during dragging
-    offset = { x: e.clientX - floatingWindow.offsetLeft, y: e.clientY - floatingWindow.offsetTop };
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      const x = e.clientX - offset.x;
-      const y = e.clientY - offset.y;
-      floatingWindow.style.left = `${x}px`;
-      floatingWindow.style.top = `${y}px`;
     }
   });
 
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-    document.removeEventListener('mousemove', preventTextSelection, true); // Remove text selection prevention
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Listen for clicks on the document to update the activeTextarea
+  document.addEventListener("click", function (event) {
+    const targetTextarea = event.target.closest("textarea");
+    if (targetTextarea && targetTextarea !== activeTextarea) {
+      activeTextarea = targetTextarea;
+    }
   });
 })();
