@@ -48,7 +48,7 @@
     container.append(
     '<div class="header", style="height: 40px;background: #dae6ee;display: flex;padding: 0 10px;margin:auto;font-weight: bold;flex-direction: row-reverse;align-items: baseline;justify-content: center;">'+
     '<h2>'+
-    'BSE Toolbox'+
+    'BSE Toolbox <a href="https://github.com/L0Lock/BSE-Toolbox", style="font-size: 0.5em;">Source</a>'+
     '</h2>'+
     '</div>'
     );
