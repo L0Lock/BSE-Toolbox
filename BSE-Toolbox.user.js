@@ -34,7 +34,7 @@
     const container = $("<div>", {
       id: "oc-mod-panel",
       class: "window",
-      style: "position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 9999; width: 300px; border: 1px solid #ccc; border-radius: 5px; padding: 0; background: #fff;",
+      style: "position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 9999; width: 300px; border: 1px solid #ccc; border-radius: 5px; padding: 0; background: #fff;",
     });
 
       /*
