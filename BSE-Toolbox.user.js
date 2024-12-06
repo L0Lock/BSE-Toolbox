@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Blender Stack Exchange Toolbox
+// @name         BSE Toolbox
 // @namespace    http://tampermonkey.net/
 // @version      0.0.1
 // @description  Adds a floating window with message templates to Blender Stack Exchange sites.
