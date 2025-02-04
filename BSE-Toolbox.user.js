@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BSE Toolbox
-// @namespace    http://tampermonkey.net/
-// @version      0.0.2
+// @namespace    https://github.com/L0Lock/BSE-Toolbox
+// @version      0.0.3
 // @description  Adds a floating window with message templates to Blender Stack Exchange sites.
 // @author       Loïc "L0Lock" Dautry
 // @match        *blender.stackexchange.com/questions/*/*
@@ -10,6 +10,8 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @updateURL    https://github.com/L0Lock/BSE-Toolbox/raw/refs/heads/main/BSE-Toolbox.user.js
+// @downloadURL  https://github.com/L0Lock/BSE-Toolbox/raw/refs/heads/main/BSE-Toolbox.user.js
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
 // @require      https://code.jquery.com/ui/1.12.1/jquery-ui.min.js
 // ==/UserScript==
