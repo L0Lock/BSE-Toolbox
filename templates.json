@@ -11,21 +11,21 @@
         },
          
         {
-            "title": "Upload screenshots",
+            "title": "🔗add screenshots",
             "targets": ["comment"],
             "categories": ["Messages"],
-            "message": "Please add screenshots or even GIFs to help us better understand your question."
+            "message": "[add screenshots](https://www.take-a-screenshot.org)"
         },
          
         {
-            "title": "Blend-Exchange",
+            "title": "🔗Blend-Exchange",
             "targets": ["comment", "answer"],
             "categories": ["Links"],
             "message": "[Blend-Exchange](https://blend-exchange.com/)"
         },
          
         {
-            "title": "File sharing guide",
+            "title": "🔗share your file",
             "targets": ["comment", "answer"],
             "categories": ["Links"],
             "message": "[share your file](https://blender.meta.stackexchange.com/a/3051/53447)"
