@@ -3,12 +3,6 @@
     
     "templates":
     [
-        {
-            "title": "Upload file to Blender-Exchange",
-            "targets": ["comment"],
-            "categories": ["Message"],
-            "message": "While detailed descriptions and screenshots are helpful, some issues might require manual investigation. Please consider sharing your .blend file with use, you can do so by uploading it to [Blend-Exchange](https://blend-exchange.com/) and add the provided text into your post."
-        },
          
         {
             "title": "🔗add screenshots",
@@ -16,14 +10,6 @@
             "categories": ["Messages"],
             "message": "[add screenshots](https://www.take-a-screenshot.org)"
         },
-         
-        {
-            "title": "🔗Blend-Exchange",
-            "targets": ["comment", "answer"],
-            "categories": ["Links"],
-            "message": "[Blend-Exchange](https://blend-exchange.com/)"
-        },
-         
         {
             "title": "🔗share your file",
             "targets": ["comment", "answer"],
