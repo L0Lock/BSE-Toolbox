@@ -18,14 +18,14 @@
         },
          
         {
-            "title": "Crash report",
+            "title": "✉️Crash report",
             "targets": ["comment", "answer"],
             "categories": ["Messages"],
             "message": "Crashes should be reported on the official bug tracker, you can open a pre-filled bug report using Blender's menu Help > Report A bug. I also highly suggest you to visit [Troubleshooting > Crashes — Blender Manual](https://docs.blender.org/manual/en/latest/troubleshooting/crash.html)"
         },
          
         {
-            "title": "XY problem",
+            "title": "✉️XY problem",
             "targets": ["comment", "answer"],
             "categories": ["Messages"],
             "message": "This sounds like the [XY Problem](https://meta.stackexchange.com/questions/66377/what-is-the-xy-problem)."
